@@ -39,6 +39,7 @@ import javax.persistence.EntityManagerFactory;
 
 import com.sun.enterprise.deployment.node.ApplicationNode;
 import com.sun.enterprise.deployment.runtime.application.wls.ApplicationParam;
+import com.sun.enterprise.deployment.runtime.common.Listener;
 import com.sun.enterprise.deployment.runtime.common.SecurityRoleMapping;
 import com.sun.enterprise.deployment.runtime.common.wls.SecurityRoleAssignment;
 import com.sun.enterprise.deployment.types.EjbReference;
@@ -83,6 +84,8 @@ public class Application extends CommonResourceBundleDescriptor
      * default value for the library-directory element
      */
     private static final String LIBRARY_DIRECTORY_DEFAULT_VALUE = "lib";
+
+    private static final String APP_INF_LIBRARY_DIRECTORY_DEFAULT_VALUE = "APP-INF/lib";
 
     private static final String PERSISTENCE_UNIT_NAME_SEPARATOR = "#";
 
@@ -193,6 +196,8 @@ public class Application extends CommonResourceBundleDescriptor
 
     private List<SecurityRoleMapping> roleMaps = new ArrayList<SecurityRoleMapping>();
     private List<SecurityRoleAssignment> wlRoleAssignments = new ArrayList<SecurityRoleAssignment>();
+
+    private List<Listener> listeners = new ArrayList<>();
 
     private boolean loadedFromApplicationXml = true;
 
@@ -872,6 +877,10 @@ public class Application extends CommonResourceBundleDescriptor
         }
     }
 
+    public String getAppInfLibraryDirectory() {
+        return APP_INF_LIBRARY_DIRECTORY_DEFAULT_VALUE;
+    }
+
     public String getLibraryDirectoryRawValue() {
         return libraryDirectory;
     }
@@ -1524,6 +1533,14 @@ public class Application extends CommonResourceBundleDescriptor
 
     public List<SecurityRoleMapping> getSecurityRoleMappings() {
         return roleMaps;
+    }
+
+    public void addListener(Listener listener) {
+        listeners.add(listener);
+    }
+
+    public List<Listener> getListeners() {
+        return listeners;
     }
 
     public List<SecurityRoleAssignment> getWlRoleAssignments() {

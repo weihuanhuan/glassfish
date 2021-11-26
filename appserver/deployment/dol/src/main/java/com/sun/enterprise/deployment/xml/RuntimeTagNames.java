@@ -132,7 +132,13 @@ public interface RuntimeTagNames extends TagNames {
     public static final String PRINCIPAL_NAME = "principal-name";
     public static final String GROUP_NAME = "group-name";
     public static final String EXTERNALLY_DEFINED = "externally-defined";
-    
+
+    // listener
+    public static final String LISTENER = "listener";
+    public static final String LISTENER_CLASS = "listener-class";
+    public static final String LISTENER_URI = "listener-uri";
+    public static final String RUN_AS_PRINCIPAL_NAME = "run-as-principal-name";
+
     // common
     public static final String EJB_REF = "ejb-ref";
     public static final String RESOURCE_REF = "resource-ref";

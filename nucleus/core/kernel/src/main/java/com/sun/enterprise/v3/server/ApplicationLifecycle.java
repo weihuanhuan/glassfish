@@ -1029,6 +1029,7 @@ public class ApplicationLifecycle implements Deployment, PostConstruct {
             return null;
         }
 
+        context.addModuleMetaData(info);
         notifyLifecycleInterceptorsBefore(ExtendedDeploymentContext.Phase.STOP, context);
 
         if (info.isLoaded()) {

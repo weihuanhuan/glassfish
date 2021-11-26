@@ -29,7 +29,7 @@
 <!--
 This is the root element of the runtime descriptor document.
 -->
-<!ELEMENT glassfish-application (web*, pass-by-reference?, unique-id?, security-role-mapping*, realm?, ejb-ref*, resource-ref*, resource-env-ref*, service-ref*, message-destination-ref*, message-destination*, archive-name?, compatibility?, keep-state?, version-identifier?) >
+<!ELEMENT glassfish-application (web*, pass-by-reference?, unique-id?, security-role-mapping*, listener*, realm?, ejb-ref*, resource-ref*, resource-env-ref*, service-ref*, message-destination-ref*, message-destination*, archive-name?, compatibility?, keep-state?, version-identifier?) >
 
 <!ELEMENT web (web-uri, context-root)>
 <!ELEMENT web-uri (#PCDATA)>
@@ -56,6 +56,12 @@ This is the root element of the runtime descriptor document.
 <!ELEMENT principal-name (#PCDATA)>
 <!ATTLIST principal-name class-name CDATA #IMPLIED>
 <!ELEMENT group-name (#PCDATA)>
+
+<!ELEMENT listener (listener-class, listener-uri?, run-as-principal-name?)>
+
+<!ELEMENT listener-class (#PCDATA)>
+<!ELEMENT listener-uri (#PCDATA)>
+<!ELEMENT run-as-principal-name (#PCDATA)>
 
 <!-- 
   realm: Allows specifying an optional authentication realm name which will

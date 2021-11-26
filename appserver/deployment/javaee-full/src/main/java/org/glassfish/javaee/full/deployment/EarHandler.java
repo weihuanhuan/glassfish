@@ -17,9 +17,11 @@
 package org.glassfish.javaee.full.deployment;
 
 import com.sun.enterprise.connectors.connector.module.RarDetector;
+import com.sun.enterprise.deployment.Application;
 import com.sun.enterprise.deployment.deploy.shared.InputJarArchive;
 import java.net.URI;
 
+import com.sun.enterprise.deployment.runtime.common.Listener;
 import org.glassfish.api.ActionReport;
 import org.glassfish.api.deployment.archive.*;
 import org.glassfish.api.deployment.DeploymentContext;
@@ -56,6 +58,9 @@ import com.sun.enterprise.universal.i18n.LocalStringsImpl;
 import com.sun.enterprise.util.LocalStringManagerImpl;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.*;
 import java.util.Map;
 import java.net.URLClassLoader;
@@ -327,10 +332,14 @@ public class EarHandler extends AbstractArchiveHandler implements CompositeHandl
             }
             
             final URL[] earLibURLs = ASClassLoaderUtil.getAppLibDirLibraries(context.getSourceDir(), holder.app.getLibraryDirectory(), compatProp);
+
+            URL[] listenerURLs = processListenerURLs(context.getSourceDir(), holder.app);
+            URL[] combinedURLs = combinedURLs(earLibURLs, listenerURLs);
+
             final EarLibClassLoader earLibCl = AccessController.doPrivileged(new PrivilegedAction<EarLibClassLoader>() {
                 @Override
                 public EarLibClassLoader run() {
-                    return new EarLibClassLoader(earLibURLs, parent);
+                    return new EarLibClassLoader(combinedURLs, parent);
                 }
             });
 
@@ -483,8 +492,44 @@ public class EarHandler extends AbstractArchiveHandler implements CompositeHandl
         }
         return cl;
     }
-    
-    
+
+    private URL[] processListenerURLs(File appRoot, Application application) throws IOException {
+        if (appRoot == null || application == null) {
+            return new URL[0];
+        }
+        List<Listener> listeners = application.getListeners();
+        if (listeners == null || listeners.isEmpty()) {
+            return new URL[0];
+        }
+
+        boolean processedEmptyUri = false;
+        List<URL> urls = new ArrayList<>();
+
+        for (Listener listener : listeners) {
+            String listenerUri = listener.getListenerUri();
+            if (listenerUri != null && listenerUri.length() != 0) {
+                URL listenerUrl = ASClassLoaderUtil.getListenerURL(appRoot, listenerUri);
+                urls.add(listenerUrl);
+            } else if (!processedEmptyUri ) {
+                processedEmptyUri = true;
+                URL[] listenerAppInfLibraries = ASClassLoaderUtil.getListenerLibraries(appRoot, application.getAppInfLibraryDirectory());
+                urls.addAll(Arrays.asList(listenerAppInfLibraries));
+            }
+        }
+        return urls.toArray(new URL[0]);
+    }
+
+    private URL[] combinedURLs(URL[] earLibURLs, URL[] listenerURLs) {
+        List<URL> urls = new ArrayList<>();
+        if (earLibURLs != null) {
+            urls.addAll(Arrays.asList(earLibURLs));
+        }
+        if (listenerURLs != null) {
+            urls.addAll(Arrays.asList(listenerURLs));
+        }
+        return urls.toArray(new URL[0]);
+    }
+
     protected void processEEPermissions(DeploymentContext dc) {
         
         EarEEPermissionsProcessor eePp = 

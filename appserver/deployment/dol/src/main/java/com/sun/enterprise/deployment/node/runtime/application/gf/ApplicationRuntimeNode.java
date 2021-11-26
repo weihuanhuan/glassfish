@@ -20,7 +20,9 @@ import com.sun.enterprise.deployment.Application;
 import com.sun.enterprise.deployment.node.ApplicationNode;
 import com.sun.enterprise.deployment.node.XMLElement;
 import com.sun.enterprise.deployment.node.runtime.*;
+import com.sun.enterprise.deployment.node.runtime.common.ListenerNode;
 import com.sun.enterprise.deployment.node.runtime.common.SecurityRoleMappingNode;
+import com.sun.enterprise.deployment.runtime.common.Listener;
 import com.sun.enterprise.deployment.runtime.common.PrincipalNameDescriptor;
 import com.sun.enterprise.deployment.runtime.common.SecurityRoleMapping;
 import com.sun.enterprise.deployment.util.DOLUtils;
@@ -61,6 +63,8 @@ public class ApplicationRuntimeNode extends RuntimeBundleNode<Application> {
      */    
     protected void init() {     
         super.init();                          
+        registerElementHandler(new XMLElement(RuntimeTagNames.LISTENER),
+                               ListenerNode.class);
         registerElementHandler(new XMLElement(RuntimeTagNames.SECURITY_ROLE_MAPPING), 
                                SecurityRoleMappingNode.class);              
         registerElementHandler(new XMLElement(RuntimeTagNames.RESOURCE_REFERENCE),
@@ -207,6 +211,13 @@ public class ApplicationRuntimeNode extends RuntimeBundleNode<Application> {
                 }
             }
         } 
+
+        if (newDescriptor instanceof Listener) {
+            Listener listener = (Listener) newDescriptor;
+            if (descriptor != null && !descriptor.isVirtual()) {
+                descriptor.addListener(listener);
+            }
+        }
     } 
     
     /**
@@ -244,6 +255,13 @@ public class ApplicationRuntimeNode extends RuntimeBundleNode<Application> {
             srmn.writeDescriptor(appNode, RuntimeTagNames.SECURITY_ROLE_MAPPING, roleMappings.get(i));
         }
         
+        //listener
+        List<Listener> listeners = application.getListeners();
+        for (int i = 0; i < listeners.size(); i++) {
+            ListenerNode listenerNode = new ListenerNode();
+            listenerNode.writeDescriptor(appNode, RuntimeTagNames.LISTENER, listeners.get(i));
+        }
+
         // realm?
         appendTextChild(appNode, RuntimeTagNames.REALM, application.getRealm());
 

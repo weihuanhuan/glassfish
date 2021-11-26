@@ -16,6 +16,7 @@
 
 package org.glassfish.javaee.full.deployment;
 
+import com.sun.enterprise.deployment.runtime.common.Listener;
 import org.glassfish.api.deployment.*;
 import org.glassfish.api.deployment.archive.ReadableArchive;
 import org.glassfish.api.deployment.archive.ArchiveHandler;
@@ -163,7 +164,32 @@ public class EarDeployer implements Deployer {
         context.getSource().removeExtraData(Hashtable.class);
         context.addModuleMetaData(appInfo);
         generateArtifacts(context);
+        prepareListenerClass(application, context);
         return true;
+    }
+
+    private void prepareListenerClass(final Application application, final DeploymentContext context) {
+        if (application == null || context == null) {
+            return;
+        }
+
+        List<Listener> listeners = application.getListeners();
+        if (listeners == null || listeners.isEmpty()) {
+            return;
+        }
+
+        ApplicationListenerInfo listenerInfo = new ApplicationListenerInfo();
+        for (Listener listener : listeners) {
+            if (listener == null) {
+                continue;
+            }
+
+            String listenerClass = listener.getListenerClass();
+            String principalName = listener.getRunAsPrincipalName();
+            ApplicationListener applicationListener = new ApplicationListener(listenerClass, principalName);
+            listenerInfo.addListener(applicationListener);
+        }
+        context.addModuleMetaData(listenerInfo);
     }
 
     protected void generateArtifacts(final DeploymentContext context) throws DeploymentException {

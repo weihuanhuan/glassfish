@@ -28,6 +28,7 @@
                         org.glassfish.api.content; \
                         org.glassfish.api.deployment; \
                         org.glassfish.api.deployment.archive; \
+                        org.glassfish.api.deployment.lifecycle; \
                         org.glassfish.api.event; \
                         org.glassfish.api.invocation; \
                         org.glassfish.api.jdbc; \

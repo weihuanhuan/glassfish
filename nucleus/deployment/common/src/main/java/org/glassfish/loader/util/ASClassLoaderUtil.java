@@ -490,6 +490,21 @@ public class ASClassLoaderUtil {
         return allLibDirLibraries;
     }
 
+    public static URL[] getListenerLibraries(File appRoot, String listenerLibDir)
+            throws IOException {
+        return convertURLListToArray(getAppLibDirLibrariesAsList(appRoot, listenerLibDir, null));
+    }
+
+    public static URL getListenerURL(File appRoot, String listenerUri) throws IOException {
+        File file = getFile(appRoot, listenerUri);
+        return file.toURI().toURL();
+    }
+
+    private static File getFile(File appRoot, String listenerUri) {
+        String listenerFile = listenerUri.replace('/', File.separatorChar);
+        return new File(appRoot, listenerFile);
+    }
+
     public static List<URI> getLibDirectoryJarURIs(File moduleLibDirectory) throws Exception {
         List<URI> libLibraryURIs = new ArrayList<URI>();
         File[] jarFiles = moduleLibDirectory.listFiles(new FileFilter() {

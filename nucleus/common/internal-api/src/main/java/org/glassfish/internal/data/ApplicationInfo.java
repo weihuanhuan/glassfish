@@ -27,6 +27,7 @@ import org.glassfish.api.container.Container;
 import org.glassfish.api.container.Sniffer;
 import org.glassfish.api.deployment.*;
 import org.glassfish.api.deployment.archive.ReadableArchive;
+import org.glassfish.api.deployment.lifecycle.ApplicationLifecycleListener;
 import org.glassfish.api.event.*;
 import org.glassfish.api.event.EventListener;
 import org.glassfish.api.event.EventListener.Event;
@@ -61,6 +62,8 @@ public class ApplicationInfo extends ModuleInfo {
 
     final private ReadableArchive source;
     final private Map<String, Object> transientAppMetaData = new HashMap<String, Object>();
+
+    final private List<ApplicationLifecycleListener> listeners = new LinkedList<>();
 
     private String libraries;
     private boolean isJavaEEApp = false;
@@ -127,6 +130,14 @@ public class ApplicationInfo extends ModuleInfo {
             return metadataType.cast(metaDataValue);
         }
         return null;
+    }
+
+    public void addListener(ApplicationLifecycleListener listener) {
+        listeners.add(listener);
+    }
+
+    public List<ApplicationLifecycleListener> getListeners() {
+        return listeners;
     }
 
     /**
